@@ -3,6 +3,7 @@
 set -e
 cd "$(dirname "$0")/.."
 # সার্ভারের ঠিকানা (GitHub repo variable SERVER_URL) অ্যাপে বসানো
+mkdir -p android/assets
 sed "s|var SERVER_URL = \"\";|var SERVER_URL = \"${SERVER_URL:-}\";|" public/index.html > android/assets/index.html
 BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
 AJAR=$(ls $ANDROID_HOME/platforms/android-34/android.jar 2>/dev/null || ls $ANDROID_HOME/platforms/*/android.jar | sort -V | tail -1)
