@@ -23,7 +23,7 @@ jobs:
         with:
           name: ChotoKaj-apk
           path: dist/ChotoKaj.apk
-      - name: Publish to Release (tag: latest)
+      - name: Publish to Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
