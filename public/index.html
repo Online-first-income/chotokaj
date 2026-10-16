@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ছোট কাজ — ChotoKaj</title>
+<style>
+:root{--ink:#111;--sub:#555;--line:#e5e5e5;--bg:#fff;--soft:#f6f6f6;--accent:#111;--ok:#0a7d3b;--bad:#c62828;--warn:#b26a00;--pend:#8a6d00}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;background:var(--bg);color:var(--ink);max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:76px}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:15px;width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--ink)}
+label{font-size:13px;font-weight:600;display:block;margin:12px 0 5px}
+.btn{background:var(--accent);color:#fff;border:none;padding:13px;border-radius:12px;font-size:16px;font-weight:700;width:100%}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
+.btn.sm{padding:8px 12px;font-size:13px;width:auto;border-radius:9px}
+.btn.danger{background:var(--bad)}
+.btn.green{background:var(--ok)}
+.btn:disabled{opacity:.4}
+.card{border:1.5px solid var(--line);border-radius:14px;padding:14px;margin:10px 14px;background:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mut{color:var(--sub);font-size:13px}
+.big{font-size:22px;font-weight:800}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.tag.pending{background:#fff3cd;color:var(--pend)} .tag.approved{background:#d9f2e2;color:var(--ok)} .tag.rejected{background:#fbe0e0;color:var(--bad)} .tag.paid{background:#d9f2e2;color:var(--ok)}
+/* auth */
+#auth{min-height:100vh;padding:34px 22px;background:#fff}
+.logo{width:76px;height:76px;border-radius:22px;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;margin:8px auto 10px;letter-spacing:.5px}
+.tabs{display:flex;gap:8px;margin:18px 0 4px}
+.tabs button{flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--ink);background:#fff;font-weight:700;font-size:15px}
+.tabs button.on{background:#111;color:#fff}
+.err{background:#fbe0e0;color:var(--bad);padding:10px 12px;border-radius:10px;font-size:13px;margin-top:12px;display:none}
+.okmsg{background:#d9f2e2;color:var(--ok);padding:10px 12px;border-radius:10px;font-size:13px;margin-top:12px;display:none}
+/* app */
+header{position:sticky;top:0;background:#fff;border-bottom:1.5px solid var(--line);padding:12px 16px;z-index:5;display:flex;justify-content:space-between;align-items:center}
+header .ttl{font-size:19px;font-weight:800}
+.balchip{background:#111;color:#fff;padding:6px 12px;border-radius:20px;font-size:13px;font-weight:700}
+.notice{background:#111;color:#fff;border-radius:12px;padding:12px 14px;margin:12px 14px 2px;font-size:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 14px}
+.grid2 .card{margin:0}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1.5px solid var(--line);display:flex;z-index:6}
+nav button{flex:1;background:none;border:none;padding:9px 2px 11px;font-size:11.5px;font-weight:600;color:var(--sub)}
+nav button.on{color:var(--ink)}
+nav button .ic{display:block;font-size:20px;margin-bottom:2px}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:10px 14px 2px}
+.chips button{white-space:nowrap;padding:7px 13px;border-radius:20px;border:1.5px solid var(--line);background:#fff;font-size:13px;font-weight:600}
+.chips button.on{background:#111;color:#fff;border-color:#111}
+.task{display:flex;gap:12px;align-items:flex-start}
+.ticon{width:46px;height:46px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.pay{font-weight:800;font-size:16px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;display:none;align-items:flex-end;justify-content:center}
+.modal .box{background:#fff;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:20px 18px 26px}
+.steps{font-size:14px;line-height:1.75;background:var(--soft);border-radius:10px;padding:10px 14px;white-space:pre-line}
+.admtabs{display:flex;gap:7px;overflow-x:auto;padding:10px 14px 0}
+.admtabs button{white-space:nowrap;padding:8px 13px;border-radius:9px;border:1.5px solid var(--ink);background:#fff;font-weight:700;font-size:13px}
+.admtabs button.on{background:#111;color:#fff}
+h3.sec{margin:16px 14px 2px;font-size:16px}
+.hidden{display:none!important}
+a{color:var(--ink)}
+.small{font-size:12px}
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:11px 18px;border-radius:24px;font-size:14px;z-index:50;display:none;max-width:88%;text-align:center}
+img.shot{width:100%;border-radius:10px;margin-top:8px;border:1px solid var(--line)}
+</style>
+</head>
+<body>
+
+<!-- ===== AUTH ===== -->
+<div id="auth">
+  <div class="logo" id="authLogo">ছক</div>
+  <div style="text-align:center">
+    <div class="big" id="authAppName">ছোট কাজ</div>
+    <div class="mut">ছোট ছোট কাজ করে আয় করুন</div>
+  </div>
+  <div class="tabs">
+    <button id="tabLogin" class="on" onclick="authTab('login')">লগইন</button>
+    <button id="tabReg" onclick="authTab('reg')">সাইন আপ</button>
+  </div>
+
+  <div id="loginForm">
+    <label>ফোন নম্বর অথবা Gmail</label>
+    <input id="li_id" placeholder="01XXXXXXXXX অথবা your@gmail.com" autocomplete="username">
+    <label>পাসওয়ার্ড</label>
+    <input id="li_pw" type="password" placeholder="পাসওয়ার্ড" autocomplete="current-password">
+    <div style="height:14px"></div>
+    <button class="btn" onclick="doLogin()">লগইন করুন</button>
+    <div style="text-align:center;margin-top:14px"><a href="#" onclick="showForgot();return false" style="font-size:14px;font-weight:600">পাসওয়ার্ড ভুলে গেছি</a></div>
+    <div id="forgotBox" class="hidden">
+      <label>অ্যাকাউন্টের ফোন/Gmail</label>
+      <input id="fg_id" placeholder="ফোন নম্বর অথবা Gmail">
+      <label>রিকভারি Gmail (রেজিস্ট্রেশনের সময় যেটা দিয়েছিলেন)</label>
+      <input id="fg_rec" placeholder="recovery@gmail.com">
+      <label>নতুন পাসওয়ার্ড</label>
+      <input id="fg_pw" type="password" placeholder="কমপক্ষে ৬ অক্ষর">
+      <div style="height:10px"></div>
+      <button class="btn ghost" onclick="doForgot()">নতুন পাসওয়ার্ড সেট করুন</button>
+      <div class="mut" style="margin-top:8px">আসল সার্ভার সংস্করণে রিসেট লিংকটি এই রিকভারি Gmail-এ পাঠানো হবে।</div>
+    </div>
+  </div>
+
+  <div id="regForm" class="hidden">
+    <label>আপনার নাম</label>
+    <input id="rg_name" placeholder="নাম লিখুন">
+    <label>অ্যাকাউন্ট খুলবেন যেভাবে</label>
+    <select id="rg_type" onchange="regTypeChange()">
+      <option value="phone">ফোন নম্বর দিয়ে</option>
+      <option value="email">Gmail / ইমেইল দিয়ে</option>
+    </select>
+    <div id="rgPhoneBox">
+      <label>ফোন নম্বর</label>
+      <input id="rg_phone" placeholder="01XXXXXXXXX" inputmode="numeric">
+    </div>
+    <div id="rgEmailBox" class="hidden">
+      <label>Gmail / ইমেইল</label>
+      <input id="rg_email" placeholder="your@gmail.com">
+    </div>
+    <label>রিকভারি Gmail <span class="mut">(পাসওয়ার্ড ভুললে লাগবে)</span></label>
+    <input id="rg_rec" placeholder="recovery@gmail.com">
+    <label>পাসওয়ার্ড</label>
+    <input id="rg_pw" type="password" placeholder="কমপক্ষে ৬ অক্ষর">
+    <label>রেফার কোড <span class="mut">(থাকলে)</span></label>
+    <input id="rg_ref" placeholder="ঐচ্ছিক">
+    <div style="height:14px"></div>
+    <button class="btn" onclick="doRegister()">অ্যাকাউন্ট খুলুন</button>
+    <div class="mut" style="margin-top:10px;text-align:center">টেম্প/ভুয়া মেইল দিয়ে অ্যাকাউন্ট খোলা যাবে না। এক ফোন নম্বর দিয়ে একটি অ্যাকাউন্টই হবে।</div>
+  </div>
+  <div class="err" id="authErr"></div>
+  <div class="okmsg" id="authOk"></div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app" class="hidden">
+  <header>
+    <div class="ttl" id="hdrName">ছোট কাজ</div>
+    <div class="balchip">৳ <span id="hdrBal">0.00</span></div>
+  </header>
+  <div id="pageRoot"></div>
+  <nav id="bottomNav"></nav>
+</div>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ============ ছোট কাজ (ChotoKaj) v2 — সার্ভার-যুক্ত সংস্করণ ============ */
+/* APK থেকে চালালে নিচের SERVER_URL-এ ডেপ্লয় করা সার্ভারের ঠিকানা বসাতে হবে।
+   ওয়েব (সার্ভার থেকেই) চালালে খালি রাখলেই হবে। */
+var SERVER_URL = "";
+var API_BASE = SERVER_URL || (location.protocol.indexOf("http") === 0 ? "" : "");
+var ADMIN_PHONE = "01786206604"; /* শুধু প্রদর্শনের জন্য — আসল অ্যাডমিন যাচাই সার্ভারে হয় */
+var TEMP_MAIL = ["tempmail","temp-mail","10minutemail","guerrillamail","mailinator","yopmail","throwaway","maildrop","getnada","sharklasers","dispostable","fakeinbox","trashmail","mintemail","mohmal","tempinbox","mailcatch","spamgourmet","tempemail","disposablemail","emailondeck","33mail","anonbox","tempail"];
+var TASK_TYPES = [
+  {k:"telegram", n:"Telegram", ic:"✈️"},{k:"facebook", n:"Facebook", ic:"📘"},{k:"instagram", n:"Instagram", ic:"📸"},
+  {k:"x", n:"X (Twitter)", ic:"🐦"},{k:"youtube", n:"YouTube", ic:"▶️"},{k:"website", n:"ওয়েবসাইট ভিজিট", ic:"🌐"},{k:"other", n:"অন্যান্য", ic:"🧩"}
+];
+var METHODS = [
+  {k:"bkash", n:"বিকাশ"},{k:"rocket", n:"রকেট"},{k:"nagad", n:"নগদ"},{k:"binance", n:"Binance"},{k:"recharge", n:"মোবাইল রিচার্জ"}
+];
+function typeName(k){var t=TASK_TYPES.filter(function(x){return x.k===k})[0];return t?t.n:k}
+function typeIcon(k){var t=TASK_TYPES.filter(function(x){return x.k===k})[0];return t?t.ic:"🧩"}
+function methodName(k){var m=METHODS.filter(function(x){return x.k===k})[0];return m?m.n:k}
+function money(n){return (Math.round(n*100)/100).toFixed(2)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function isTempMail(email){var d=(email.split("@")[1]||"").toLowerCase();return TEMP_MAIL.some(function(t){return d.indexOf(t.trim())>=0})}
+function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e)}
+function validPhone(p){return /^01[3-9]\d{8}$/.test(p)}
+function toast(msg){var t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(function(){t.style.display="none"},2600)}
+
+/* ---------- API ---------- */
+var TOKEN_KEY = "ck_token_v2";
+function getToken(){return localStorage.getItem(TOKEN_KEY)}
+function setToken(t){if(t)localStorage.setItem(TOKEN_KEY,t);else localStorage.removeItem(TOKEN_KEY)}
+async function api(path, method, body){
+  var opt = { method: method || "GET", headers: { "Content-Type": "application/json" } };
+  var tk = getToken(); if (tk) opt.headers["Authorization"] = "Bearer " + tk;
+  if (body) opt.body = JSON.stringify(body);
+  var r;
+  try { r = await fetch(API_BASE + path, opt); }
+  catch(e) { throw new Error("সার্ভারের সাথে সংযোগ হচ্ছে না — ইন্টারনেট চেক করুন"); }
+  var data = {};
+  try { data = await r.json(); } catch(e) {}
+  if (!r.ok) throw new Error(data.error || ("সমস্যা হয়েছে (" + r.status + ")"));
+  return data;
+}
+/* স্থানীয় মিরর — সার্ভার থেকে আসা হালনাগাদ ডেটা */
+var db = { settings: null, users: [], tasks: [], subs: [], withdrawals: [], orders: [], proofs: [], refsCount: 0 };
+var CUR = null;
+function me(){ return CUR; }
+async function refresh(){
+  var d = await api("/api/bootstrap");
+  CUR = d.user; db.settings = d.settings; db.tasks = d.tasks;
+  db.subs = d.mySubs; db.withdrawals = d.myWithdrawals; db.proofs = d.proofs; db.refsCount = d.refs;
+  if (CUR && db.users.length === 0) db.users = [CUR];
+  document.getElementById("hdrBal").textContent = money(CUR.available);
+  document.getElementById("hdrName").textContent = db.settings.appName;
+  return d;
+}
+async function adminRefresh(){
+  var d = await api("/api/admin/bootstrap");
+  db.users = d.users; db.tasks = d.tasks; db.subs = d.subs; db.withdrawals = d.withdrawals; db.orders = d.orders; db.settings = Object.assign(db.settings || {}, d.settings);
+  return d;
+}
+
+/* ---------- AUTH ---------- */
+function authTab(t){
+  document.getElementById("tabLogin").className = t === "login" ? "on" : "";
+  document.getElementById("tabReg").className = t === "reg" ? "on" : "";
+  document.getElementById("loginForm").className = t === "login" ? "" : "hidden";
+  document.getElementById("regForm").className = t === "reg" ? "" : "hidden";
+  authErr(""); authOk("");
+}
+function authErr(m){var e=document.getElementById("authErr");e.textContent=m;e.style.display=m?"block":"none"}
+function authOk(m){var e=document.getElementById("authOk");e.textContent=m;e.style.display=m?"block":"none"}
+function regTypeChange(){
+  var t=document.getElementById("rg_type").value;
+  document.getElementById("rgPhoneBox").className=t==="phone"?"":"hidden";
+  document.getElementById("rgEmailBox").className=t==="email"?"":"hidden";
+}
+function showForgot(){document.getElementById("forgotBox").className="";window.scrollTo(0,document.body.scrollHeight)}
+async function doRegister(){
+  authErr(""); authOk("");
+  var body = {
+    name: document.getElementById("rg_name").value.trim(),
+    type: document.getElementById("rg_type").value,
+    phone: document.getElementById("rg_phone").value.trim(),
+    email: document.getElementById("rg_email").value.trim().toLowerCase(),
+    recovery: document.getElementById("rg_rec").value.trim().toLowerCase(),
+    pass: document.getElementById("rg_pw").value,
+    ref: document.getElementById("rg_ref").value.trim()
+  };
+  if (body.type === "email" && isTempMail(body.email)) return authErr("টেম্প/ভুয়া মেইল দিয়ে অ্যাকাউন্ট খোলা যাবে না।");
+  try {
+    var d = await api("/api/register", "POST", body);
+    setToken(d.token); await refresh(); enterApp();
+    toast(CUR.role === "admin" ? "স্বাগতম, অ্যাডমিন! 👑" : "অ্যাকাউন্ট তৈরি হয়েছে! স্বাগতম 🎉");
+  } catch(e) { authErr(e.message); }
+}
+async function doLogin(){
+  authErr("");
+  try {
+    var d = await api("/api/login", "POST", { id: document.getElementById("li_id").value.trim(), pass: document.getElementById("li_pw").value });
+    setToken(d.token); await refresh(); enterApp(); toast("লগইন হয়েছে ✅");
+  } catch(e) { authErr(e.message); }
+}
+async function doForgot(){
+  authErr(""); authOk("");
+  try {
+    await api("/api/forgot", "POST", { id: document.getElementById("fg_id").value.trim(), recovery: document.getElementById("fg_rec").value.trim(), newpass: document.getElementById("fg_pw").value });
+    authOk("পাসওয়ার্ড বদলানো হয়েছে ✅ এখন নতুন পাসওয়ার্ড দিয়ে লগইন করুন।");
+  } catch(e) { authErr(e.message); }
+}
+function logout(){ setToken(null); location.reload(); }
+
+/* ---------- SHELL ---------- */
+var page = "home", taskFilter = "all", admTab = "dash";
+function enterApp(){
+  if (!CUR) return;
+  document.getElementById("auth").className = "hidden";
+  document.getElementById("app").className = "";
+  go("home");
+}
+function renderNav(){
+  var items = [["home","🏠","হোম"],["tasks","🧰","কাজ"],["mywork","📋","আমার কাজ"],["wallet","👛","ওয়ালেট"],["profile","👤","প্রোফাইল"]];
+  if (CUR && CUR.role === "admin") items.push(["admin","👑","অ্যাডমিন"]);
+  document.getElementById("bottomNav").innerHTML = items.map(function(it){
+    return '<button class="' + (page === it[0] ? "on" : "") + '" onclick="go(\'' + it[0] + '\')"><span class="ic">' + it[1] + '</span>' + it[2] + '</button>';
+  }).join("");
+  if (CUR) document.getElementById("hdrBal").textContent = money(CUR.available);
+}
+async function go(p){
+  page = p; renderNav(); window.scrollTo(0, 0);
+  var r = document.getElementById("pageRoot");
+  try {
+    await refresh();
+    if (p === "admin") await adminRefresh();
+  } catch(e) { if (String(e.message).indexOf("লগইন") >= 0) { setToken(null); location.reload(); return; } }
+  if (p === "home") r.innerHTML = vHome();
+  else if (p === "tasks") r.innerHTML = vTasks();
+  else if (p === "mywork") r.innerHTML = vMyWork();
+  else if (p === "wallet") r.innerHTML = vWallet();
+  else if (p === "profile") r.innerHTML = vProfile();
+  else if (p === "admin") r.innerHTML = vAdmin();
+  renderNav();
+}
+function openModal(html){document.getElementById("modalBox").innerHTML=html;document.getElementById("modal").style.display="flex"}
+function closeModal(){document.getElementById("modal").style.display="none"}
+document.getElementById("modal").addEventListener("click",function(e){if(e.target===this)closeModal()});
+
+/* ---------- USER VIEWS ---------- */
+function subsOf(uidv){return db.subs.filter(function(s){return s.userId===uidv})}
+function taskLeft(t){ if (typeof t.used === "number") return t.slots - t.used; var used=db.subs.filter(function(s){return s.taskId===t.id&&s.status!=="rejected"}).length; return t.slots-used; }
+function vHome(){
+  var u=me(),s=db.settings;
+  var my=subsOf(u.id);
+  var done=my.filter(function(x){return x.status==="approved"}).length;
+  var pend=my.filter(function(x){return x.status==="pending"}).length;
+  var newTasks=db.tasks.filter(function(t){return t.active&&taskLeft(t)>0}).slice(0,3);
+  var h='<div class="notice">'+esc(s.notice)+'</div>';
+  h+='<div class="grid2"><div class="card"><div class="mut">Available ব্যালেন্স</div><div class="big">৳'+money(u.available)+'</div><button class="btn sm" style="margin-top:8px" onclick="go(\'wallet\')">টাকা তুলুন</button></div>';
+  h+='<div class="card"><div class="mut">Pending ব্যালেন্স</div><div class="big">৳'+money(u.pending)+'</div><div class="mut" style="margin-top:8px">অনুমোদনের অপেক্ষায়: '+pend+'টি কাজ</div></div></div>';
+  h+='<div class="grid2"><div class="card"><div class="mut">সম্পন্ন কাজ</div><div class="big">'+done+'টি</div></div><div class="card"><div class="mut">মোট আয়</div><div class="big">৳'+money(u.totalEarned)+'</div></div></div>';
+  h+='<h3 class="sec">🔥 নতুন কাজ</h3>';
+  if(!newTasks.length)h+='<div class="card mut">এখন নতুন কাজ নেই। পরে আবার দেখুন।</div>';
+  h+=newTasks.map(taskCard).join("");
+  h+='<div style="margin:4px 14px"><button class="btn ghost" onclick="go(\'tasks\')">সব কাজ দেখুন →</button></div>';
+  h+='<div class="card"><div class="row"><div><b>🎁 রেফার করে আয় করুন</b><div class="mut">বন্ধুর আয়ের '+s.referPct+'% বোনাস পাবেন</div></div><button class="btn sm" onclick="go(\'profile\')">লিংক নিন</button></div></div>';
+  return h;
+}
+function taskCard(t){
+  var left=taskLeft(t);
+  return '<div class="card"><div class="task"><div class="ticon">'+typeIcon(t.type)+'</div><div style="flex:1"><div class="row"><b>'+esc(t.title)+'</b><span class="pay">৳'+money(t.pay)+'</span></div><div class="mut">'+typeName(t.type)+' • বাকি স্লট: '+left+'/'+t.slots+'</div><button class="btn sm" style="margin-top:8px" onclick="openTask(\''+t.id+'\')">কাজটি করুন →</button></div></div></div>';
+}
+function vTasks(){
+  var s=db.settings;
+  var chips=[["all","সব"]].concat(TASK_TYPES.map(function(t){return [t.k,t.n]}));
+  var h='<div class="chips">'+chips.map(function(c){return '<button class="'+(taskFilter===c[0]?"on":"")+'" onclick="taskFilter=\''+c[0]+'\';go(\'tasks\')">'+c[1]+'</button>'}).join("")+'</div>';
+  var list=db.tasks.filter(function(t){return t.active&&taskLeft(t)>0&&(taskFilter==="all"||t.type===taskFilter)});
+  h+='<div class="mut" style="margin:6px 14px">প্রতি কাজে পেমেন্ট হার: ৳'+money(s.rate)+' • আজকের সীমা: '+s.dailyLimit+'টি কাজ</div>';
+  h+=list.length?list.map(taskCard).join(""):'<div class="card mut">এই ধরনের কোনো কাজ এখন নেই।</div>';
+  h+='<div class="card"><div class="row"><div><b>💼 কাজ দিন</b><div class="mut">আপনার চ্যানেল/পেজের জন্য কাজ পোস্ট করুন</div></div><button class="btn sm" onclick="openOrder()">অর্ডার করুন</button></div></div>';
+  return h;
+}
+var curTask=null, curShot=null, curShotHash="";
+function shotHashOf(str){var h=5381;for(var i=0;i<str.length;i++){h=((h<<5)+h+str.charCodeAt(i))>>>0}return "h"+h.toString(36)}
+function openTask(id){
+  var u=me();curTask=db.tasks.filter(function(t){return t.id===id})[0];if(!curTask)return;
+  curShot=null;curShotHash="";
+  var mine=db.subs.filter(function(s){return s.taskId===id&&s.userId===u.id&&s.status!=="rejected"})[0];
+  var h='<div class="row"><b style="font-size:17px">'+esc(curTask.title)+'</b><span class="pay">৳'+money(curTask.pay)+'</span></div>';
+  h+='<div class="mut" style="margin:4px 0 10px">'+typeName(curTask.type)+' • বাকি স্লট: '+taskLeft(curTask)+'</div>';
+  h+='<div class="steps">'+esc(curTask.desc)+'</div>';
+  h+='<div style="height:10px"></div><a href="'+esc(curTask.link)+'" target="_blank" rel="noopener"><button class="btn ghost">🔗 কাজের লিংক খুলুন</button></a>';
+  if(mine){
+    h+='<div class="okmsg" style="display:block;margin-top:14px">আপনি এই কাজের প্রমাণ ইতিমধ্যে জমা দিয়েছেন — অবস্থা: '+(mine.status==="pending"?"অপেক্ষমাণ ⏳":"অনুমোদিত ✅")+'</div>';
+  }else{
+    h+='<label>আপনার ইউজারনেম / প্রোফাইল লিংক</label><input id="pf_user" placeholder="যেমন: @username অথবা প্রোফাইল লিংক">';
+    h+='<label>স্ক্রিনশট (প্রমাণ)</label><input id="pf_shot" type="file" accept="image/*" onchange="readShot(this)"><div id="shotPrev"></div>';
+    h+='<div style="height:12px"></div><button class="btn" onclick="submitProof()">প্রমাণ জমা দিন</button>';
+  }
+  h+='<div style="height:8px"></div><button class="btn ghost" onclick="closeModal()">বন্ধ করুন</button>';
+  openModal(h);
+}
+function readShot(inp){
+  var f=inp.files&&inp.files[0];if(!f)return;
+  curShotHash=shotHashOf(f.name+"_"+f.size+"_"+f.lastModified);
+  var r=new FileReader();
+  r.onload=function(){
+    var img=new Image();
+    img.onload=function(){
+      var cv=document.createElement("canvas");var max=900;var sc=Math.min(1,max/Math.max(img.width,img.height));
+      cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);
+      cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+      curShot=cv.toDataURL("image/jpeg",0.72);
+      document.getElementById("shotPrev").innerHTML='<img class="shot" src="'+curShot+'">';
+    };
+    img.src=r.result;
+  };
+  r.readAsDataURL(f);
+}
+async function submitProof(){
+  var uname=document.getElementById("pf_user").value.trim();
+  if(!uname)return toast("আপনার ইউজারনেম/প্রোফাইল লিংক দিন");
+  if(!curShotHash)return toast("স্ক্রিনশট সিলেক্ট করুন");
+  try{
+    var d=await api("/api/submissions","POST",{taskId:curTask.id,uname:uname,shot:curShot,shotHash:curShotHash});
+    closeModal();await go("mywork");
+    toast(d.dup?"প্রমাণ জমা হয়েছে ⚠️ (এই স্ক্রিনশট আগেও ব্যবহৃত — অ্যাডমিন যাচাই করবেন)":"প্রমাণ জমা হয়েছে ✅ যাচাইয়ের পর টাকা পাবেন");
+  }catch(e){toast(e.message)}
+}
+function vMyWork(){
+  var u=me();var my=subsOf(u.id).slice().reverse();
+  if(!my.length)return '<div class="card mut" style="margin-top:14px">আপনি এখনো কোনো কাজ জমা দেননি। <a href="#" onclick="go(\'tasks\');return false">কাজ দেখুন</a></div>';
+  return my.map(function(s){
+    var t=db.tasks.filter(function(x){return x.id===s.taskId})[0];
+    var tag=s.status==="pending"?'<span class="tag pending">⏳ অপেক্ষমাণ</span>':s.status==="approved"?'<span class="tag approved">✅ অনুমোদিত</span>':'<span class="tag rejected">❌ বাতিল</span>';
+    var h='<div class="card"><div class="row"><b>'+esc(t?t.title:"(মুছে ফেলা কাজ)")+'</b>'+tag+'</div><div class="mut">'+new Date(s.at).toLocaleString("bn-BD")+' • পেমেন্ট: ৳'+money(s.pay)+'</div>';
+    if(s.status==="rejected"&&s.reason)h+='<div class="mut" style="color:var(--bad)">কারণ: '+esc(s.reason)+'</div>';
+    if(s.shot)h+='<img class="shot" src="'+s.shot+'">';
+    return h+'</div>';
+  }).join("");
+}
+function openOrder(){
+  var opts=TASK_TYPES.map(function(t){return '<option value="'+t.k+'">'+t.n+'</option>'}).join("");
+  var h='<b style="font-size:17px">💼 কাজ দিন (ক্লায়েন্ট অর্ডার)</b><div class="mut" style="margin:6px 0">অ্যাডমিন অনুমোদন করলে আপনার কাজটি তালিকায় যাবে। পেমেন্টের জন্য অ্যাডমিন সাপোর্টে যোগাযোগ করবেন।</div>';
+  h+='<label>কাজের ধরন</label><select id="od_type">'+opts+'</select>';
+  h+='<label>শিরোনাম</label><input id="od_title" placeholder="যেমন: আমার চ্যানেলে জয়েন করুন">';
+  h+='<label>লিংক</label><input id="od_link" placeholder="https://...">';
+  h+='<label>কতজন লাগবে (স্লট)</label><input id="od_slots" type="number" value="100" min="1">';
+  h+='<div style="height:12px"></div><button class="btn" onclick="submitOrder()">অর্ডার পাঠান</button><div style="height:8px"></div><button class="btn ghost" onclick="closeModal()">বন্ধ করুন</button>';
+  openModal(h);
+}
+async function submitOrder(){
+  try{
+    await api("/api/orders","POST",{type:document.getElementById("od_type").value,title:document.getElementById("od_title").value.trim(),link:document.getElementById("od_link").value.trim(),slots:parseInt(document.getElementById("od_slots").value||"0",10)});
+    closeModal();toast("অর্ডার পাঠানো হয়েছে ✅ অ্যাডমিন যাচাই করবেন");
+  }catch(e){toast(e.message)}
+}
+
+/* ---------- WALLET & PROFILE ---------- */
+function vWallet(){
+  var u=me(),s=db.settings;
+  var h='<div class="grid2"><div class="card"><div class="mut">Available ব্যালেন্স</div><div class="big">৳'+money(u.available)+'</div></div><div class="card"><div class="mut">Pending ব্যালেন্স</div><div class="big">৳'+money(u.pending)+'</div></div></div>';
+  h+='<div class="grid2"><div class="card"><div class="mut">মোট আয়</div><div class="big">৳'+money(u.totalEarned)+'</div></div><div class="card"><div class="mut">মোট উত্তোলন</div><div class="big">৳'+money(u.totalWithdrawn)+'</div></div></div>';
+  h+='<div style="margin:6px 14px"><button class="btn" onclick="openWithdraw()">💸 টাকা তুলুন / রিচার্জ নিন</button></div>';
+  h+='<h3 class="sec">উত্তোলনের ইতিহাস</h3>';
+  var ws=db.withdrawals.slice().reverse();
+  if(!ws.length)h+='<div class="card mut">এখনো কোনো উত্তোলন করা হয়নি।</div>';
+  h+=ws.map(function(w){
+    var tag=w.status==="pending"?'<span class="tag pending">⏳ অপেক্ষমাণ</span>':w.status==="paid"?'<span class="tag paid">✅ পাঠানো হয়েছে</span>':'<span class="tag rejected">❌ বাতিল</span>';
+    return '<div class="card"><div class="row"><b>'+methodName(w.method)+' — ৳'+money(w.amount)+'</b>'+tag+'</div><div class="mut">'+esc(w.detail)+' • '+new Date(w.at).toLocaleString("bn-BD")+'</div>'+(w.status==="rejected"&&w.reason?'<div class="mut" style="color:var(--bad)">কারণ: '+esc(w.reason)+'</div>':'')+'</div>';
+  }).join("");
+  return h;
+}
+function openWithdraw(){
+  var u=me(),s=db.settings;
+  var opts=METHODS.filter(function(m){return s.methodsOn[m.k]}).map(function(m){return '<option value="'+m.k+'">'+m.n+' (সর্বনিম্ন ৳'+s.minWithdraw[m.k]+')</option>'}).join("");
+  var h='<b style="font-size:17px">💸 উত্তোলন</b><div class="mut" style="margin:6px 0">Available ব্যালেন্স: ৳'+money(u.available)+'<br>টাকা অ্যাডমিন ম্যানুয়ালি পাঠাবেন (সাধারণত ২৪-৭২ ঘণ্টা)।</div>';
+  h+='<label>মাধ্যম</label><select id="wd_method" onchange="wdMethodChange()">'+opts+'</select>';
+  h+='<label id="wd_detail_lbl">বিকাশ নম্বর</label><input id="wd_detail" placeholder="01XXXXXXXXX">';
+  h+='<div id="wd_extra"></div>';
+  h+='<label>পরিমাণ (৳)</label><input id="wd_amount" type="number" step="0.01" placeholder="0.00">';
+  h+='<div style="height:12px"></div><button class="btn" onclick="submitWithdraw()">অনুরোধ পাঠান</button><div style="height:8px"></div><button class="btn ghost" onclick="closeModal()">বন্ধ করুন</button>';
+  openModal(h);wdMethodChange();
+}
+function wdMethodChange(){
+  var m=document.getElementById("wd_method").value;
+  var lbl=document.getElementById("wd_detail_lbl"),inp=document.getElementById("wd_detail"),ex=document.getElementById("wd_extra");
+  ex.innerHTML="";
+  if(m==="bkash"){lbl.textContent="বিকাশ নম্বর";inp.placeholder="01XXXXXXXXX"}
+  else if(m==="rocket"){lbl.textContent="রকেট নম্বর";inp.placeholder="01XXXXXXXXX"}
+  else if(m==="nagad"){lbl.textContent="নগদ নম্বর";inp.placeholder="01XXXXXXXXX"}
+  else if(m==="binance"){lbl.textContent="Binance UID / ওয়ালেট ঠিকানা";inp.placeholder="UID অথবা USDT ঠিকানা";ex.innerHTML='<label>কয়েন / নেটওয়ার্ক</label><input id="wd_coin" placeholder="যেমন: USDT (TRC20)">'}
+  else if(m==="recharge"){lbl.textContent="মোবাইল নম্বর";inp.placeholder="01XXXXXXXXX";ex.innerHTML='<label>অপারেটর</label><select id="wd_op"><option>গ্রামীণফোন</option><option>বাংলালিংক</option><option>রবি</option><option>এয়ারটেল</option><option>টেলিটক</option></select>'}
+}
+async function submitWithdraw(){
+  var m=document.getElementById("wd_method").value;
+  var extra="";
+  if(m==="binance"){var c=document.getElementById("wd_coin");extra=c?c.value.trim():""}
+  if(m==="recharge"){var o=document.getElementById("wd_op");extra=o?o.value:""}
+  try{
+    await api("/api/withdrawals","POST",{method:m,detail:document.getElementById("wd_detail").value.trim(),amount:parseFloat(document.getElementById("wd_amount").value||"0"),extra:extra});
+    closeModal();await go("wallet");toast("উত্তোলনের অনুরোধ পাঠানো হয়েছে ✅");
+  }catch(e){toast(e.message)}
+}
+function vProfile(){
+  var u=me(),s=db.settings;
+  var base = API_BASE || location.origin;
+  var link=base+"/download?ref="+u.referCode;
+  var h='<div class="card" style="margin-top:14px"><div class="row"><b style="font-size:17px">'+esc(u.name)+'</b>'+(u.role==="admin"?'<span class="tag approved">👑 অ্যাডমিন</span>':'<span class="tag pending">ব্যবহারকারী</span>')+'</div>';
+  h+='<div class="mut">'+(u.phone?"📱 "+esc(u.phone):"")+(u.email?"<br>📧 "+esc(u.email):"")+'<br>যোগদান: '+new Date(u.joined).toLocaleDateString("bn-BD")+'</div></div>';
+  h+='<div class="card"><b>🎁 রেফার করুন, বোনাস পান</b><div class="mut" style="margin:6px 0">আপনার লিংক দিয়ে যারা আসবে, তাদের কাজের আয়ের '+s.referPct+'% বোনাস আপনি পাবেন — আজীবন। লিংকটি শেয়ার করলে তারা অ্যাপ ডাউনলোডের পেজ পাবে।</div><label>আপনার রেফার কোড</label><input readonly value="'+u.referCode+'" onclick="this.select()"><label>রেফার লিংক (শেয়ার করুন)</label><input readonly value="'+esc(link)+'" onclick="this.select()"><div class="row" style="margin-top:10px"><span class="mut">রেফার করেছেন: <b>'+db.refsCount+' জন</b></span><span class="mut">রেফার আয়: <b>৳'+money(u.referEarned)+'</b></span></div></div>';
+  h+='<div class="card"><b>💳 আমার পেমেন্ট নম্বর</b><div class="mut" style="margin:6px 0">একটি নম্বর বেঁধে রাখলে শুধু ওই নম্বরেই টাকা তুলতে পারবেন (নিরাপত্তার জন্য)।</div><label>বিকাশ/নগদ/রকেট নম্বর</label><input id="pf_paynum" value="'+esc(u.payNumber||"")+'" placeholder="01XXXXXXXXX"><div style="height:10px"></div><button class="btn sm" onclick="savePayNum()">সংরক্ষণ করুন</button></div>';
+  h+='<div class="card"><b>📄 পেমেন্ট প্রুফ</b><div class="mut" style="margin:6px 0">সম্প্রতি যাদের পেমেন্ট দেওয়া হয়েছে:</div>'+proofList()+'</div>';
+  h+='<div class="card"><b>📖 নিয়মাবলী</b><div class="steps" style="margin-top:8px">'+esc(s.rules)+'</div></div>';
+  h+='<div class="card"><b>🆘 সাপোর্ট</b><div style="height:8px"></div><div class="row"><a href="'+esc(s.supportTelegram)+'" target="_blank" rel="noopener"><button class="btn sm ghost">✈️ Telegram</button></a><a href="'+esc(s.supportWhatsApp)+'" target="_blank" rel="noopener"><button class="btn sm ghost">💬 WhatsApp</button></a></div></div>';
+  h+='<div style="margin:4px 14px 16px"><button class="btn danger" onclick="logout()">লগ আউট</button></div>';
+  return h;
+}
+function proofList(){
+  var paid=db.proofs||[];
+  if(!paid.length)return '<div class="mut">এখনো কোনো পেমেন্ট প্রুফ নেই।</div>';
+  return paid.map(function(w){
+    var masked=String(w.detail).replace(/(\d{3})\d{5}(\d{3})/,"$1•••••$2");
+    return '<div class="row" style="padding:5px 0;border-bottom:1px solid var(--line)"><span>'+esc(w.name)+'</span><span class="mut">'+methodName(w.method)+' '+esc(masked)+' — <b>৳'+money(w.amount)+'</b> ✅</span></div>';
+  }).join("");
+}
+async function savePayNum(){
+  try{
+    await api("/api/paynumber","POST",{payNumber:document.getElementById("pf_paynum").value.trim()});
+    await refresh();toast("পেমেন্ট নম্বর সংরক্ষিত ✅");
+  }catch(e){toast(e.message)}
+}
+
+/* ---------- ADMIN ---------- */
+function vAdmin(){
+  var u=me();
+  if(!u||u.role!=="admin")return '<div class="card" style="margin-top:14px">⛔ এই অংশ শুধু অ্যাডমিনের জন্য।</div>';
+  var tabs=[["dash","📊 ড্যাশবোর্ড"],["proofs","🖼️ প্রমাণ ("+db.subs.filter(function(s){return s.status==="pending"}).length+")"],["wds","💸 উত্তোলন ("+db.withdrawals.filter(function(w){return w.status==="pending"}).length+")"],["tasks","🧰 কাজ"],["orders","💼 অর্ডার ("+db.orders.filter(function(o){return o.status==="pending"}).length+")"],["users","👥 ব্যবহারকারী"],["settings","⚙️ সেটিংস"]];
+  var h='<div class="admtabs">'+tabs.map(function(t){return '<button class="'+(admTab===t[0]?"on":"")+'" onclick="admTab=\''+t[0]+'\';go(\'admin\')">'+t[1]+'</button>'}).join("")+'</div>';
+  if(admTab==="dash")h+=aDash();
+  else if(admTab==="proofs")h+=aProofs();
+  else if(admTab==="wds")h+=aWds();
+  else if(admTab==="tasks")h+=aTasks();
+  else if(admTab==="orders")h+=aOrders();
+  else if(admTab==="users")h+=aUsers();
+  else if(admTab==="settings")h+=aSettings();
+  return h;
+}
+function aDash(){
+  var s=db.settings;
+  var paidOut=db.withdrawals.filter(function(w){return w.status==="paid"}).reduce(function(a,w){return a+w.amount},0);
+  var h='<div class="grid2"><div class="card"><div class="mut">মোট ব্যবহারকারী</div><div class="big">'+db.users.length+'</div></div><div class="card"><div class="mut">মোট কাজ</div><div class="big">'+db.tasks.length+'</div></div></div>'
+  +'<div class="grid2"><div class="card"><div class="mut">অপেক্ষমাণ প্রমাণ</div><div class="big">'+db.subs.filter(function(x){return x.status==="pending"}).length+'</div></div><div class="card"><div class="mut">অপেক্ষমাণ উত্তোলন</div><div class="big">'+db.withdrawals.filter(function(x){return x.status==="pending"}).length+'</div></div></div>'
+  +'<div class="grid2"><div class="card"><div class="mut">মোট পেমেন্ট দেওয়া</div><div class="big">৳'+money(paidOut)+'</div></div><div class="card"><div class="mut">বর্তমান রেট / রেফার</div><div class="big">৳'+money(s.rate)+' / '+s.referPct+'%</div></div></div>';
+  if(s.adminRecoveryCode)h+='<div class="card"><b>🔑 আপনার অ্যাডমিন রিকভারি কোড</b><div class="mut" style="margin:6px 0">এটি নিরাপদ জায়গায় লিখে রাখুন:</div><div class="big" style="letter-spacing:1px">'+esc(s.adminRecoveryCode)+'</div></div>';
+  return h;
+}
+function userName(id){var x=db.users.filter(function(u){return u.id===id})[0];return x?x.name:"?"}
+function aProofs(){
+  var list=db.subs.filter(function(s){return s.status==="pending"}).slice().reverse();
+  var old=db.subs.filter(function(s){return s.status!=="pending"}).slice().reverse().slice(0,10);
+  var h='<h3 class="sec">অপেক্ষমাণ প্রমাণ</h3>';
+  if(!list.length)h+='<div class="card mut">কোনো অপেক্ষমাণ প্রমাণ নেই।</div>';
+  h+=list.map(function(s){
+    var t=db.tasks.filter(function(x){return x.id===s.taskId})[0];
+    var c='<div class="card"><div class="row"><b>'+esc(t?t.title:"?")+'</b><span class="pay">৳'+money(s.pay)+'</span></div><div class="mut">👤 '+esc(userName(s.userId))+' • ইউজারনেম: '+esc(s.uname)+'</div>';
+    if(s.dup)c+='<div style="color:var(--warn);font-weight:700;font-size:13px;margin-top:4px">⚠️ এই স্ক্রিনশট আগে ব্যবহৃত হয়েছে — ভালো করে যাচাই করুন</div>';
+    if(s.shot)c+='<img class="shot" src="'+s.shot+'">';else c+='<div class="mut" style="margin-top:6px">📎 স্ক্রিনশট জমা হয়েছে</div>';
+    c+='<div class="row" style="margin-top:10px"><button class="btn sm green" onclick="approveSub(\''+s.id+'\')">✅ Approve</button><button class="btn sm danger" onclick="rejectSub(\''+s.id+'\')">❌ Reject</button></div></div>';
+    return c;
+  }).join("");
+  if(old.length){h+='<h3 class="sec">সাম্প্রতিক সিদ্ধান্ত</h3>'+old.map(function(s){var t=db.tasks.filter(function(x){return x.id===s.taskId})[0];return '<div class="card"><div class="row"><span>'+esc(t?t.title:"?")+' — '+esc(userName(s.userId))+'</span>'+(s.status==="approved"?'<span class="tag approved">✅</span>':'<span class="tag rejected">❌</span>')+'</div></div>'}).join("")}
+  return h;
+}
+async function approveSub(id){
+  try{ await api("/api/admin/subs/"+id+"/approve","POST",{}); await go("admin"); toast("অনুমোদিত ✅ টাকা ব্যবহারকারীর ওয়ালেটে গেছে"); }catch(e){toast(e.message)}
+}
+async function rejectSub(id){
+  var reason=prompt("বাতিলের কারণ লিখুন (ব্যবহারকারী দেখতে পাবে):","স্ক্রিনশটে কাজটি ঠিকমতো দেখা যাচ্ছে না");
+  if(reason===null)return;
+  try{ await api("/api/admin/subs/"+id+"/reject","POST",{reason:reason}); await go("admin"); toast("বাতিল করা হয়েছে"); }catch(e){toast(e.message)}
+}
+function aWds(){
+  var list=db.withdrawals.filter(function(w){return w.status==="pending"}).slice().reverse();
+  var h='<h3 class="sec">অপেক্ষমাণ উত্তোলন</h3>';
+  if(!list.length)h+='<div class="card mut">কোনো অপেক্ষমাণ উত্তোলন নেই।</div>';
+  h+=list.map(function(w){
+    return '<div class="card"><div class="row"><b>'+methodName(w.method)+' — ৳'+money(w.amount)+'</b></div><div class="mut">👤 '+esc(userName(w.userId))+'<br>📥 '+esc(w.detail)+'<br>'+new Date(w.at).toLocaleString("bn-BD")+'</div><div class="mut" style="margin-top:6px">টাকা পাঠিয়ে "পাঠানো হয়েছে" চাপ দিন।</div><div class="row" style="margin-top:8px"><button class="btn sm green" onclick="payWd(\''+w.id+'\')">✅ পাঠানো হয়েছে</button><button class="btn sm danger" onclick="rejectWd(\''+w.id+'\')">❌ বাতিল</button></div></div>';
+  }).join("");
+  return h;
+}
+async function payWd(id){ try{ await api("/api/admin/withdrawals/"+id+"/pay","POST",{}); await go("admin"); toast("পেইড হিসেবে চিহ্নিত ✅"); }catch(e){toast(e.message)} }
+async function rejectWd(id){
+  var reason=prompt("বাতিলের কারণ:","নম্বরে সমস্যা আছে — সাপোর্টে যোগাযোগ করুন");
+  if(reason===null)return;
+  try{ await api("/api/admin/withdrawals/"+id+"/reject","POST",{reason:reason}); await go("admin"); toast("বাতিল — টাকা ফেরত গেছে"); }catch(e){toast(e.message)}
+}
+function aTasks(){
+  var h='<div style="margin:12px 14px 2px"><button class="btn" onclick="editTask(null)">➕ নতুন কাজ যোগ করুন</button></div>';
+  h+=db.tasks.slice().reverse().map(function(t){
+    return '<div class="card"><div class="task"><div class="ticon">'+typeIcon(t.type)+'</div><div style="flex:1"><div class="row"><b>'+esc(t.title)+'</b><span class="pay">৳'+money(t.pay)+'</span></div><div class="mut">'+typeName(t.type)+' • স্লট: '+t.slots+' • অবস্থা: '+(t.active?"চালু ✅":"বন্ধ ⏸️")+'</div><div class="row" style="margin-top:8px"><button class="btn sm ghost" onclick="editTask(\''+t.id+'\')">✏️ এডিট</button><button class="btn sm ghost" onclick="toggleTask(\''+t.id+'\')">'+(t.active?"⏸️ বন্ধ করুন":"▶️ চালু করুন")+'</button><button class="btn sm danger" onclick="delTask(\''+t.id+'\')">🗑️</button></div></div></div></div>';
+  }).join("");
+  return h;
+}
+function editTask(id){
+  var t=id?db.tasks.filter(function(x){return x.id===id})[0]:{type:"telegram",title:"",link:"",desc:"১. লিংকে ক্লিক করুন\n২. কাজটি সম্পন্ন করুন\n৩. স্ক্রিনশট নিয়ে প্রমাণ জমা দিন",pay:db.settings.rate,slots:100,active:true};
+  if(!t)return;
+  var opts=TASK_TYPES.map(function(x){return '<option value="'+x.k+'"'+(t.type===x.k?" selected":"")+'>'+x.n+'</option>'}).join("");
+  var h='<b style="font-size:17px">'+(id?"✏️ কাজ এডিট":"➕ নতুন কাজ")+'</b>';
+  h+='<label>ধরন</label><select id="tk_type">'+opts+'</select>';
+  h+='<label>শিরোনাম</label><input id="tk_title" value="'+esc(t.title)+'">';
+  h+='<label>লিংক</label><input id="tk_link" value="'+esc(t.link)+'" placeholder="https://...">';
+  h+='<label>নির্দেশনা (ধাপে ধাপে)</label><textarea id="tk_desc" rows="5">'+esc(t.desc)+'</textarea>';
+  h+='<label>পেমেন্ট (৳)</label><input id="tk_pay" type="number" step="0.01" value="'+t.pay+'">';
+  h+='<label>স্লট (কতজন করতে পারবে)</label><input id="tk_slots" type="number" value="'+t.slots+'">';
+  h+='<div style="height:12px"></div><button class="btn" onclick="saveTask('+(id?"'"+id+"'":"null")+')">সংরক্ষণ করুন</button><div style="height:8px"></div><button class="btn ghost" onclick="closeModal()">বন্ধ করুন</button>';
+  openModal(h);
+}
+async function saveTask(id){
+  var data={type:document.getElementById("tk_type").value,title:document.getElementById("tk_title").value.trim(),link:document.getElementById("tk_link").value.trim(),desc:document.getElementById("tk_desc").value,pay:parseFloat(document.getElementById("tk_pay").value||"0"),slots:parseInt(document.getElementById("tk_slots").value||"0",10)};
+  try{
+    if(id)await api("/api/admin/tasks/"+id,"PUT",data); else await api("/api/admin/tasks","POST",data);
+    closeModal();await go("admin");toast("কাজ সংরক্ষিত ✅ এখন সবার ফোনে দেখা যাবে");
+  }catch(e){toast(e.message)}
+}
+async function toggleTask(id){ try{ await api("/api/admin/tasks/"+id+"/toggle","POST",{}); await go("admin"); }catch(e){toast(e.message)} }
+async function delTask(id){ if(!confirm("এই কাজটি মুছে ফেলবেন?"))return; try{ await api("/api/admin/tasks/"+id,"DELETE"); await go("admin"); toast("মুছে ফেলা হয়েছে"); }catch(e){toast(e.message)} }
+function aOrders(){
+  var list=db.orders.filter(function(o){return o.status==="pending"}).slice().reverse();
+  var h='<h3 class="sec">ক্লায়েন্ট অর্ডার</h3>';
+  if(!list.length)h+='<div class="card mut">কোনো অপেক্ষমাণ অর্ডার নেই।</div>';
+  h+=list.map(function(o){
+    return '<div class="card"><b>'+esc(o.title)+'</b><div class="mut">'+typeName(o.type)+' • স্লট: '+o.slots+'<br>🔗 '+esc(o.link)+'<br>👤 অর্ডার করেছেন: '+esc(userName(o.userId))+'</div><div class="row" style="margin-top:8px"><button class="btn sm green" onclick="approveOrder(\''+o.id+'\')">✅ অনুমোদন (কাজ তৈরি হবে)</button><button class="btn sm danger" onclick="rejectOrder(\''+o.id+'\')">❌</button></div></div>';
+  }).join("");
+  return h;
+}
+async function approveOrder(id){ try{ await api("/api/admin/orders/"+id+"/approve","POST",{}); await go("admin"); toast("অর্ডার অনুমোদিত — কাজ যোগ হয়েছে ✅"); }catch(e){toast(e.message)} }
+async function rejectOrder(id){ try{ await api("/api/admin/orders/"+id+"/reject","POST",{}); await go("admin"); }catch(e){toast(e.message)} }
+function aUsers(){
+  var h='<h3 class="sec">ব্যবহারকারী ('+db.users.length+')</h3>';
+  h+=db.users.slice().reverse().map(function(x){
+    return '<div class="card"><div class="row"><b>'+esc(x.name)+'</b>'+(x.role==="admin"?'<span class="tag approved">👑 অ্যাডমিন</span>':x.banned?'<span class="tag rejected">ব্যান</span>':'<span class="tag pending">সক্রিয়</span>')+'</div><div class="mut">'+(x.phone?"📱 "+esc(x.phone)+" ":"")+(x.email?"📧 "+esc(x.email):"")+'<br>ব্যালেন্স: ৳'+money(x.available)+' (Pending ৳'+money(x.pending)+') • আয়: ৳'+money(x.totalEarned)+'</div>'+(x.role!=="admin"?'<div class="row" style="margin-top:8px"><button class="btn sm ghost" onclick="resetUserPw(\''+x.id+'\')">🔑 পাসওয়ার্ড রিসেট</button><button class="btn sm '+(x.banned?"green":"danger")+'" onclick="toggleBan(\''+x.id+'\')">'+(x.banned?"আনব্যান":"ব্যান করুন")+'</button></div>':"")+'</div>';
+  }).join("");
+  return h;
+}
+async function resetUserPw(id){
+  var np=prompt("ব্যবহারকারীর নতুন পাসওয়ার্ড লিখুন (কমপক্ষে ৬ অক্ষর) — তাকে জানিয়ে দিন:");
+  if(!np)return;
+  try{ await api("/api/admin/users/"+id+"/resetpw","POST",{newpass:np}); toast("পাসওয়ার্ড রিসেট হয়েছে ✅"); }catch(e){toast(e.message)}
+}
+async function toggleBan(id){ try{ await api("/api/admin/users/"+id+"/ban","POST",{}); await go("admin"); }catch(e){toast(e.message)} }
+function aSettings(){
+  var s=db.settings;
+  var h='<div class="card" style="margin-top:14px"><b>⚙️ সাধারণ সেটিংস</b>';
+  h+='<label>অ্যাপের নাম</label><input id="st_name" value="'+esc(s.appName)+'">';
+  h+='<label>প্রতি কাজের রেট (৳)</label><input id="st_rate" type="number" step="0.01" value="'+s.rate+'">';
+  h+='<label>রেফার বোনাস (%)</label><input id="st_ref" type="number" value="'+s.referPct+'">';
+  h+='<label>প্রতিদিন সর্বোচ্চ কাজ (জনপ্রতি)</label><input id="st_limit" type="number" value="'+s.dailyLimit+'">';
+  h+='<label>হোমের নোটিশ</label><textarea id="st_notice" rows="2">'+esc(s.notice)+'</textarea>';
+  h+='<label>নিয়মাবলীর লেখা</label><textarea id="st_rules" rows="6">'+esc(s.rules)+'</textarea>';
+  h+='<label>সাপোর্ট Telegram লিংক</label><input id="st_tg" value="'+esc(s.supportTelegram)+'">';
+  h+='<label>সাপোর্ট WhatsApp লিংক</label><input id="st_wa" value="'+esc(s.supportWhatsApp)+'">';
+  h+='</div><div class="card"><b>💸 উত্তোলন সেটিংস</b>';
+  METHODS.forEach(function(m){
+    h+='<div class="row" style="margin-top:10px"><span><b>'+m.n+'</b></span><span><label style="display:inline;margin:0 6px 0 0">সর্বনিম্ন ৳</label><input style="width:90px;display:inline" type="number" id="st_min_'+m.k+'" value="'+s.minWithdraw[m.k]+'"> <label style="display:inline;margin:0 0 0 8px"><input type="checkbox" style="width:auto" id="st_on_'+m.k+'"'+(s.methodsOn[m.k]?" checked":"")+'> চালু</label></span></div>';
+  });
+  h+='<div style="height:14px"></div><button class="btn" onclick="saveSettings()">✅ সব সংরক্ষণ করুন</button><div class="mut" style="margin-top:8px">সংরক্ষণ করলেই পরিবর্তন সব ব্যবহারকারীর ফোনে দেখা যাবে।</div></div>';
+  return h;
+}
+async function saveSettings(){
+  var minW={},on={};
+  METHODS.forEach(function(m){ minW[m.k]=parseFloat(document.getElementById("st_min_"+m.k).value||"0"); on[m.k]=document.getElementById("st_on_"+m.k).checked; });
+  var data={appName:document.getElementById("st_name").value.trim(),rate:parseFloat(document.getElementById("st_rate").value||"0"),referPct:parseFloat(document.getElementById("st_ref").value||"0"),dailyLimit:parseInt(document.getElementById("st_limit").value||"0",10),notice:document.getElementById("st_notice").value,rules:document.getElementById("st_rules").value,supportTelegram:document.getElementById("st_tg").value.trim(),supportWhatsApp:document.getElementById("st_wa").value.trim(),minWithdraw:minW,methodsOn:on};
+  try{
+    await api("/api/admin/settings","PUT",data);
+    await refresh();document.title=db.settings.appName+" — ChotoKaj";await go("admin");toast("সেটিংস সংরক্ষিত ✅");
+  }catch(e){toast(e.message)}
+}
+
+/* ---------- INIT ---------- */
+(async function(){
+  var params=new URLSearchParams(location.search);
+  var ref=params.get("ref");
+  if(ref){var ri=document.getElementById("rg_ref");if(ri)ri.value=ref;authTab("reg");}
+  if(getToken()){
+    try{ await refresh(); if(CUR){document.getElementById("auth").className="hidden";enterApp();} }
+    catch(e){ setToken(null); }
+  }
+})();
+</script>
+</body>
+</html>

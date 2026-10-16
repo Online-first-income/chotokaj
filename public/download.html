@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ছোট কাজ — অ্যাপ ডাউনলোড</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#fff;color:#111;max-width:480px;margin:0 auto;padding:36px 22px;text-align:center}
+.logo{width:84px;height:84px;border-radius:24px;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;margin:10px auto}
+.btn{display:block;background:#111;color:#fff;text-decoration:none;padding:15px;border-radius:12px;font-size:17px;font-weight:700;margin:14px 0}
+.btn.ghost{background:#fff;color:#111;border:1.5px solid #111}
+.mut{color:#555;font-size:14px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="logo">ছক</div>
+<h1>ছোট কাজ</h1>
+<p class="mut">ছোট ছোট কাজ করে মোবাইল দিয়েই আয় করুন।<br>বিকাশ, নগদ, রকেট, Binance ও মোবাইল রিচার্জে পেমেন্ট।</p>
+<a class="btn" id="apkBtn" href="https://github.com/REPLACE-USERNAME/chotokaj/releases/latest">⬇️ Android অ্যাপ ডাউনলোড করুন (APK)</a>
+<a class="btn ghost" id="webBtn" href="/">🌐 ওয়েব অ্যাপে কাজ করুন</a>
+<p class="mut">ইনস্টলের সময় “অজানা সোর্স থেকে ইনস্টল” অনুমতি চাইলে Allow দিন।<br>রেফার কোড দিয়ে ডাউনলোড করলে কোডটি অ্যাপে সাইন আপের সময় বসালেই বোনাসের হিসাব যুক্ত হবে — এই পেজ থেকে ওয়েব অ্যাপে গেলে কোডটি নিজে থেকেই বসে যাবে।</p>
+<script>
+// রেফার কোড থাকলে ওয়েব অ্যাপের লিংকে পাঠিয়ে দেওয়া
+(function(){
+  var ref = new URLSearchParams(location.search).get("ref");
+  if (ref) document.getElementById("webBtn").href = "/?ref=" + encodeURIComponent(ref);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"description":"ছোট কাজ (ChotoKaj) — মাইক্রো জব অ্যাপের সার্ভার","engines":{"node":">=18"},"main":"server.js","name":"chotokaj-server","scripts":{"start":"node server.js"},"version":"2.0.0"}
